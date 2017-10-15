@@ -1,5 +1,6 @@
 local AddonName, Addon = ...
-local ParentAddonName, ParentAddon = GetAddOnDependencies(AddonName), _G[ParentAddonName]
+local ParentAddonName = GetAddOnDependencies(AddonName)
+local ParentAddon = _G[ParentAddonName]
 local L = LibStub('AceLocale-3.0'):GetLocale(ParentAddonName .. '-Config')
 
 local AddonOptionsPanel = Addon:CreateClass('Frame')
@@ -57,6 +58,29 @@ do
 		self:Hide()
 
 		InterfaceOptions_AddCategory(self)
+
+		self:InitializeAce()
+	end
+
+	function AddonOptions:InitializeAce()
+		local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+		local AceRegistry = LibStub("AceConfigRegistry-3.0")
+
+		local options = {
+			type = "group",
+			name = "Dominos",
+			args = {}
+		}
+		
+		options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(ParentAddon.db, true)
+		local LibDualSpec = LibStub("LibDualSpec-1.0", true)
+		if LibDualSpec then LibDualSpec:EnhanceOptions(options.args.profile, ParentAddon.db) end
+
+		options.args.profile.order = 1
+
+		AceRegistry:RegisterOptionsTable(ParentAddonName, options, true)
+
+		AceConfigDialog:AddToBlizOptions(ParentAddonName, "Profiles", self.name, "profile")
 	end
 
 	function AddonOptions:OnShow()
